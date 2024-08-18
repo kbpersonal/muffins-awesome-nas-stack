@@ -1,7 +1,7 @@
 ---
 - name: Clone snapraid-btrfs-runner repository # noqa latest
   ansible.builtin.git:
-    repo: https://github.com/fmoledina/snapraid-btrfs-runner.git
+    repo: https://github.com/kbpersonal/snapraid-btrfs-runner.git
     dest: "{{ dir_snapraid_btfs_runner }}"
     update: true
 

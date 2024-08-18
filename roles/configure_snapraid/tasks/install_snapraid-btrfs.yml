@@ -1,7 +1,7 @@
 ---
 - name: Clone or update snapraid-btrfs repository # noqa latest
   ansible.builtin.git:
-    repo: https://github.com/automorphism88/snapraid-btrfs.git
+    repo: https://github.com/D34DC3N73R/snapraid-btrfs.git
     dest: /tmp/snapraid-btrfs
     update: true
 

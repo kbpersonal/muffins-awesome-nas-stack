@@ -23,3 +23,8 @@ maxsize = {{ configure_snapraid_logging_maxsize }}
 enabled = {{ configure_snapraid_scrub_enabled | lower }}
 plan = {{ configure_snapraid_scrub_plan }}
 older-than = {{ configure_snapraid_scrub_older_than }}
+
+[discord]
+enabled = {{ snapraid_btrfs_runner_discord_enabled | lower }}
+sendon = success,error
+webhook_url = {{ snapraid_btrfs_runner_discord_webhook }} 
