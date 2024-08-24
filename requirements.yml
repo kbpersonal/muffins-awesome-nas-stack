@@ -5,5 +5,9 @@ roles:
     version: 7.0.1
 
 collections:
+  - name: ansible.posix
+    version: 1.5.4
   - name: community.general
+  - name: community.docker
+    version: 3.12.1
   - name: vladgh.samba
