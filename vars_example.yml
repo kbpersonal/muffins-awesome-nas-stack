@@ -123,12 +123,18 @@ cache_file_chmod: "770"
 cache_folder_chmod: "770"
 on_calendar_schedule: "*-*-* 03:00:00" # 3AM daily https://silentlad.com/systemd-timers-oncalendar-(cron)-format-explained
 
-# scrutiny vars
+# Scrutiny vars
 scrutiny_mode: "omnibus"  # Can be 'omnibus' or 'collector'. Leave as-is if unsure.
 scrutiny_master_url: "http://scrutiny-master:8080"  # Used only in collector mode
 scrutiny_webui_port: 8080 # Used only in omnibus mode
+# Disk mapping for scrutiny (Refer to: https://github.com/AnalogJ/scrutiny/blob/master/docs/TROUBLESHOOTING_DEVICE_COLLECTOR.md#force-devdiskby-id-paths  )
+disk_mapping:
+  - /dev/disk/by-id/scsi-xxxx:/dev/sda
+  - /dev/disk/by-id/scsi-xxxx:/dev/sdb
+  - /dev/disk/by-id/nvme-xxxx:/dev/nvme0
+  - /dev/disk/by-id/nvme-xxxx:/dev/nvme1
 
-# Scrutiny notificattion vars
+# Scrutiny notification vars
 # https://containrrr.dev/shoutrrr/v0.8/services/discord/ && https://github.com/AnalogJ/scrutiny/blob/master/example.scrutiny.yaml
 
 # Discord
