@@ -7,10 +7,12 @@
     pull: true
     ports: "{{ scrutiny_ports if scrutiny_mode != 'collector' else omit }}"
     volumes: "{{ scrutiny_volumes }}"
-    devices: "{{ all_disks }}"
+    devices: "{{ disk_mapping }}"
     capabilities:
       - SYS_RAWIO
       - SYS_ADMIN
     restart_policy: unless-stopped
     env:
       COLLECTOR_API_ENDPOINT: "{{ scrutiny_master_url if scrutiny_mode == 'collector' else omit }}"
+  tags:
+    - scrutiny

@@ -41,3 +41,5 @@
             {{ scrutiny_pushbullet_channel | default('') }}
             {{ scrutiny_pushbullet_email | default('') }}
           {% endif %}
+  tags:
+    - scrutiny

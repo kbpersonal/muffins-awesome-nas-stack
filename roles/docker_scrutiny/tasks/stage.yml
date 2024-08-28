@@ -6,6 +6,8 @@
   loop:
     - "{{ scrutiny_config_path }}"
     - "{{ scrutiny_influxdb_path }}"
+  tags:
+    - scrutiny
 
 - name: Download the Scrutiny configuration file
   ansible.builtin.get_url:
@@ -13,6 +15,8 @@
     dest: "{{ scrutiny_config_file }}"
     mode: "0644"
   when: scrutiny_mode != 'collector'
+  tags:
+    - scrutiny
 
 - name: Download the Scrutiny collector configuration file
   ansible.builtin.get_url:
@@ -20,3 +24,5 @@
     dest: "{{ scrutiny_config_path }}/collector.yaml"
     mode: "0644"
   when: scrutiny_mode == 'collector'
+  tags:
+    - scrutiny
