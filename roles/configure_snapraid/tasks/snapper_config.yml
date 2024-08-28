@@ -9,9 +9,9 @@
 
     - name: Add the repository to apt sources
       ansible.builtin.apt_repository:
-        repo: deb http://download.opensuse.org/repositories/filesystems:/snapper/Debian_12/
+        repo: "deb http://download.opensuse.org/repositories/filesystems:/snapper/Debian_12/ /"
         state: present
-        filename: filesystems:snapper.list
+        filename: "filesystems_snapper"
 
     - name: Install snapper
       ansible.builtin.apt:
