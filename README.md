@@ -2,6 +2,10 @@
 
 ## Changelog
 
+* [v0.90 - Tag Release](https://github.com/monstermuffin/muffins-awesome-nas-stack/releases/tag/v0.90)
+  * Add 0.89.1 changes into release.
+  * Fix Scrutiny mappings - Scrutiny is now running as a privileged container which is the easiest way to achieve that is required. Not doing so requires some annoying Ansible voodoo to get the mappings correct, especially with SSDs/NVMEs. If this is an issue for you, simply turn off auto-deployment of Scrutiny in vars and deploy it yourself as required. 
+
 * v0.89.1 - No release
   * Modified mergerfs `minfreespace` from 1G to 10G.
   * Added `cache_pool_policy` var to allow users to select a different mergerfs policy if required for multiple cache devices.
@@ -109,7 +113,7 @@ ___
 
 `configure_powerlevel10k: true` — Configures [powerlevel10k](https://github.com/romkatv/powerlevel10k)
 
-`fastfetch_motd: true` — Sets a MOTD to be fastfetch. Useful IMO. Must have zsh enabled to work.
+`fastfetch_motd: true` — Sets a MOTD to be fastfetch. Useful IMO. Must have zsh enabled to work. Fastfetch will be installed if missing.
 
 `install_rclone: true` — Installs rclone.
 
