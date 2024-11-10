@@ -1,25 +1,6 @@
 ---
 - name: Snapper configuration
   block:
-    - name: Add the GPG key for the repository for Debian 12
-      ansible.builtin.apt_key:
-        url: https://download.opensuse.org/repositories/filesystems:snapper/Debian_12/Release.key
-        keyring: /etc/apt/trusted.gpg.d/filesystems_snapper.gpg
-        state: present
-
-    - name: Add the repository to apt sources
-      ansible.builtin.apt_repository:
-        repo: "deb http://download.opensuse.org/repositories/filesystems:/snapper/Debian_12/ /"
-        state: present
-        filename: "filesystems_snapper"
-
-    - name: Install snapper
-      ansible.builtin.apt:
-        name:
-          - snapper
-        state: present
-        update_cache: true
-
     - name: Ensure the base config is named 'default'
       ansible.builtin.copy:
         src: /usr/share/snapper/config-templates/default
