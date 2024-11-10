@@ -27,10 +27,6 @@
     group: root
     mode: '0644'
 
-- name: Update apt cache
-  ansible.builtin.apt:
-    update_cache: true
-
 - name: Install Snapper from openSUSE repository
   ansible.builtin.apt:
     name:
@@ -38,11 +34,13 @@
       - libsnapper
     state: present
     force: true
+    update_cache: true
 
 - name: Check Snapper version
   ansible.builtin.command: snapper --version
   register: snapper_version
   changed_when: false
+  check_mode: false
 
 - name: Display Snapper version
   ansible.builtin.debug:
