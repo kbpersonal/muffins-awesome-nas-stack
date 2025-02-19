@@ -22,6 +22,8 @@ smb_media_share_name: media-share
 
 # snapraid/snapper
 configure_snapraid_snapraid_deletethreshold: 150
+split_parity_files: 3 # Number of files per parity disk, do not change if unsure.
+split_parity_migrate: true # See README/v0.92 changelog
 
 # sshkeys
 ssh_key_option: none # Options: github, url, file, none
@@ -105,10 +107,12 @@ data_disks:
   - /dev/disk/by-id/ata-xxxx
   - /dev/disk/by-id/ata-xxxx
   - /dev/disk/by-id/ata-xxxx
-parity_disks:
-  - /dev/disk/by-id/ata-xxxx
 cache_disks:
   - /dev/disk/by-id/nvme-xxxx
+parity_disks: # https://github.com/monstermuffin/muffins-awesome-nas-stack/tree/dev#disk-config
+  - device: /dev/disk/by-id/ata-xxxx
+    mode: dedicated
+    level: 1
 
 # cache mover vars - https://github.com/monstermuffin/mergerfs-cache-mover
 cache_mover_autoupdate: true
@@ -121,9 +125,15 @@ cache_mover_max_workers: 8
 cache_mover_max_log_size_mb: 100
 cache_mover_log_backup_count: 5
 cache_mover_excluded_dirs:
-  - snapraid # Don't remove this
+  # - exmample dir
   # - other_dirs_as_needed
 on_calendar_schedule: "*-*-* 03:00:00" # 3AM daily https://silentlad.com/systemd-timers-oncalendar-(cron)-format-explained
+cache_mover_notif_enabled: true # https://github.com/monstermuffin/mergerfs-cache-mover/tree/main#notifications
+cache_mover_notif_urls: # https://github.com/caronc/apprise#productivity-based-notifications
+  - 'discord://webhook_id/webhook_token'
+  - 'slack://hooks/tokenA/tokenB/tokenC'
+cache_mover_notif_threshold: true
+
 
 # Scrutiny vars
 scrutiny_mode: "omnibus"  # Can be 'omnibus' or 'collector'. Leave as-is if unsure.

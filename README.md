@@ -1,50 +1,10 @@
 # ✨ MANS ✨ — Muffin's Awesome NAS Stack
 
-## Changelog
-
-* [v0.91](https://github.com/monstermuffin/muffins-awesome-nas-stack/releases/tag/v0.91) - Feature and Improvement Release
-
-  * TL;DR - Improved/streamlined a bunch. Thanks @tigattack ❤️ 
-  * Replaced cmd with POSIX mount (in most cases).
-  * Implemented SnapRAID configuration and improvements.
-  * Enhanced disk management.
-  * Added tags to playbook.
-  * Improved `ansible_managed` strings.
-  * Improved output formatting and debugging information.
-  * Streamlined role usage in playbooks.
-  * Improved MergerFS configuration and service management.
-  * Enhanced SnapRAID installation and configuration process.
-  * Optimized Linux management tasks.
-  * Simplified conditionals and eliminated silent failures in various roles.
-  * Fixed HD-idle role.
-  * Corrected default group name usage.
-  * Resolved issues with Ansible check mode compatibility.
-  * Fixed mount path templating in MergerFS configuration.
-  * Addressed various minor bugs across different roles.
-  * Updated documentation with new commands and error information.
-  * Removed unused files and configurations.
-  * Updated .gitignore and ansible-lint exclude rules.
-  * Installed Ansible dependencies to .dependencies directory.
-  * Implemented Ansible linting in CI pipeline.
-
-* [v0.90](https://github.com/monstermuffin/muffins-awesome-nas-stack/releases/tag/v0.90)
-  * Add 0.89.1 changes into release.
-  * Fix Scrutiny mappings - Scrutiny is now running as a privileged container which is the easiest way to achieve that is required. Not doing so requires some annoying Ansible voodoo to get the mappings correct, especially with SSDs/NVMEs. If this is an issue for you, simply turn off auto-deployment of Scrutiny in vars and deploy it yourself as required. 
-
-* v0.89.1
-  * Modified mergerfs `minfreespace` from 1G to 10G.
-  * Added `cache_pool_policy` var to allow users to select a different mergerfs policy if required for multiple cache devices.
-
-* [v0.89 - Beta](https://github.com/monstermuffin/muffins-awesome-nas-stack/releases/tag/v0.89)
-  * Released role in a state that is ready to be deployed/tested by others.
-
 ## Intro
-
 An Ansible role for setting up a Debian based NAS using mergerfs, SnapRaid & snapraid-btrfs, utilising caching with automatic cache 'moving' to a backing pool.
 ___
 
 ## Tasks
-
 This role will do the following:
 
 * Check for updates and autoupdate if accepted
@@ -78,7 +38,6 @@ This role will do the following:
 * Deploys & Configures [Scrutiny](https://github.com/AnalogJ/scrutiny)
 
 ## More Info
-
 I have written in-depth blog posts about how I got here and detailing how this setup works.
 
 * [Part 3: Designing & Deploying MANS — A Hybrid NAS Approach with SnapRAID, MergerFS, and OpenZFS ](https://blog.muffn.io/posts/part-3-mini-100tb-nas/) attempts to explain my design approach.
@@ -96,7 +55,10 @@ I would ***highly recommend*** you read, at least, those two blog posts so you a
 * Understand what this role does and how it configures all the bits of software it uses.
 * A device (ideally running MacOS/Linux) with Ansible.
 * A machine that you will be using as a NAS with multiple drives (minimum 3).
-  * Disk(s) for parity that is/are larger or as large as your largest data disk.
+  * Disk(s) for parity that is/are larger or as large as your largest data disk, for most setups, see note below.
+
+> [!NOTE]
+>As of v0.92 multiple smaller parity disks can be used. This works by having multiple parity files on the smaller disks. So you may use 2x 8TB parity disks when using 16TB data disks, for example. Be aware that this means your parity/'backup' is now dependent on multiple disks being available. This **is not** the same as having 2 parity disks configured.
 
 ## Clone
 
@@ -169,6 +131,8 @@ ___
 ___
 `data_directories` — Top level directories that will be created on every `data_disks` and `parity_disks`.
 ___
+
+### Disk Config
 You ***must*** have your disks formatted in the format that is pre-filled. You can of course add or remove any entries as necessary, but `/dev/disk/by-id/your-disk` must be how the vars are entered.
 
 Any of the disks can be added/removed at any time, simply make your changes and rerun, that's the point of this.
@@ -185,7 +149,105 @@ done
 
 `data_disks` — Your data disks.
 
-`parity_disks` — Your parity disk(s). As previous, these must be larger or as large as the largest data disk. Must be at least 1 disk here.
+`parity_disks` — Your parity disk(s). Must be at least 1 disk here.
+
+> [!IMPORTANT]
+> As of MANS v0.92 parity disk configuration has changed significantly due to https://github.com/monstermuffin/muffins-awesome-nas-stack/issues/24 and https://github.com/monstermuffin/muffins-awesome-nas-stack/issues/25. 
+>
+> The role will fail if you have an older version of the variables but a newer version of the role. Simply change the format as below.
+
+There are two 'modes' to put a parity disk into, dedicated and split.
+
+* Dedicated parity disks are single parity disk(s). This means the disk(s) are **larger or as large as your largest data disk.**
+* Split parity disks are **smaller then your largest data disk but larger or as large when combined together.** This allows you to use multiple smaller parity disks when using larger data disks.
+
+Example parity config:
+```yml
+parity_disks:
+  # Level 1 split across two disks
+  - device: /dev/disk/by-id/disk1
+    mode: split
+    level: 1
+  - device: /dev/disk/by-id/disk2
+    mode: split
+    level: 1
+  # Level 2 is a single dedicated disk
+  - device: /dev/disk/by-id/disk3
+    mode: dedicated
+    level: 2
+```
+
+`Levels` are defined as an entire parity level. So you can only ever have one level per dedicated disk, as this is a dedicated parity `level`. The only time a `level` should be spread across disks is when using split mode. This is done because of the complexities of deploying such a config accurately. 
+
+A split config can have as many disks as required to be larger or as large as your largest data disk, as long as they are in the same `level`.
+
+Example A: You want one parity level and your parity disk is larger than any of your data disks:
+```yml
+parity_disks:
+  - device: /dev/disk/by-id/disk1
+    mode: dedicated
+    level: 1
+```
+> [!TIP]
+> In most cases this is the setup you will be using.
+
+Example B: You want two parity levels and your parity disks are larger than any of your data disks:
+```yml
+parity_disks:
+  - device: /dev/disk/by-id/disk1
+    mode: dedicated
+    level: 1
+  - device: /dev/disk/by-id/disk2
+    mode: dedicated
+    level: 2
+```
+> [!TIP]
+> In most cases this is the setup you will be using if you want multiple parity.
+
+Example C: You want to split a parity across two smaller disks. Your largest data disk is 16TB. Both your parity disks are 8TB:
+```yml
+parity_disks:
+  - device: /dev/disk/by-id/disk1
+    mode: split
+    level: 1
+  - device: /dev/disk/by-id/disk2
+    mode: split
+    level: 1
+```
+
+Example D: You want to mix a dedicated parity disk as well as add a split parity across two other disks:
+```yml
+parity_disks:
+  - device: /dev/disk/by-id/disk1
+    mode: split
+    level: 1
+  - device: /dev/disk/by-id/disk2
+    mode: split
+    level: 1
+  - device: /dev/disk/by-id/disk3
+    mode: dedicated
+    level: 2
+```
+
+Example E: You want two levels of parity, both using split disks:
+```yml
+parity_disks:
+  - device: /dev/disk/by-id/disk1
+    mode: split
+    level: 1
+  - device: /dev/disk/by-id/disk2
+    mode: split
+    level: 1
+  - device: /dev/disk/by-id/disk3
+    mode: split
+    level: 2
+  - device: /dev/disk/by-id/disk4
+    mode: split
+    level: 2
+```
+
+> [!IMPORTANT]  
+> MANS will attempt to warn about incorrect parity var config at the start of the run, but this cannot be guaranteed.
 
 `cache_disks` — Any fast disk you want to send writes to, ideally this should be an NVME. This variable can be:
 
@@ -202,7 +264,6 @@ If you left `configure_scrutiny` to `true` then you can setup `omnibus` or `coll
 To get notifications about your disk health, enable one or more of the notification options and enter the relevant variables for the service.
 
 ## Install Requirements
-
 To install the requirements, in the proect dir run the following:
 
 ```bash
@@ -211,7 +272,6 @@ ansible-galaxy install -r requirements.yml
 ```
 
 ## Deploying
-
 To run the playbook, simply run:
 
 ```bash
@@ -259,11 +319,9 @@ ansible-playbook playbook.yml --tags install_btrfs --list-tasks
 
 
 ## Usage
-
 After a successful deployment, you will have the following (dependent on config):
 
 ### Mounts
-
 * `/mnt/media` — This is the 'cached' share (if any cache device was specified). This is where writes will go and samba is configured to serve to/from.
 * `/mnt/media-cold` — 'Non-cached' share. This is the pool of backing data disks.
 * `/mnt/cache-pool` — If multiple cache devices were defined, this is the mount point for the pooled cache devices.
@@ -333,5 +391,87 @@ data03 /mnt/data-disks/data03
 
 If necessary, you can run `snapper` commands via `snapraid-btrfs`, and this seems to work fine: `snapraid-btrfs snapper <command>`
 
+## Split Parity Migration
+MANS now supports split parity files to overcome ext4's 16TB file size limitation. This allows using data disks larger than 16TB with ext4-formatted parity disks by splitting parity data across multiple files.
+Migration is only required if:
+
+* You have an existing single-file setup **AND**
+* You plan to use data disks larger than 16TB
+
+> [!NOTE]  
+> Whilst there is no real need to enable migration if the above in your situation is true, there may come a time when this option is deprecated completely. New deployments are split, so this can technically stay here forever, but I can't see the future. 
+>
+> It would be best to migrate when you can.
+
+To migrate:
+
+### Set MANS to migrate
+
+In your vars.yml, set:
+
+```yaml
+split_parity_migrate: true
+```
+> [!NOTE]
+> You will need to add this variable most likely if you have an existing MANS setup, please see `vars_example.yml` for any new vars you may be missing from updates.
+
+### Run the MANS playbook
+
+```bash
+ansible-playbook playbook.yml
+```
+
+After playbook completion:
+
+#### Delete existing parity file
+```bash
+sudo rm /mnt/parity-disks/parity01/snapraid.parity
+```
+
+> [!WARNING]  
+> This may take significant time and look like it's hung, it's not. Do this in a tmux window and in another session you can see free/used space slowly changing with `df -h`. For my 12Tb parity file the delete action took  14m 40s.
+
+> [!NOTE] 
+> You may have more parity files to delete on other disks.
+
+#### Rebuild parity in split files
+
+> [!IMPORTANT] 
+> If you have a lot of data this can take a significant amount of time. I highly recommend running the command below in a [tmux](https://www.howtogeek.com/671422/how-to-use-tmux-on-linux-and-why-its-better-than-screen/) window to run unattended. If you spawn sync in a normal SSH window and that connection is broken, it will break the sync.
+
+```bash
+sudo snapraid-btrfs sync --force-full
+```
+> [!NOTE]
+>The sync process can take significant time depending on array size. Do not interrupt the process, as above.
+>
+>Each parity disk will have its own set of split files (e.g., snapraid-1.parity, snapraid-2.parity, snapraid-3.parity)
+>
+>Files are filled sequentially - when one file is full, SnapRAID moves to the next
+
+> [!NOTE]
+> As below, this took me about 26h to do 72Tb.
+
+```bash
+100% completed, 72481609 MB accessed in 26:10     0:00 ETA
+
+     d1 20% | ************
+     d2 22% | *************
+     d3  9% | *****
+     d4  5% | ***
+     d5 10% | ******
+     d6 10% | ******
+     d7  0% |
+ parity  7% | ****
+   raid  3% | **
+   hash 11% | ******
+  sched  0% |
+   misc  0% |
+            |______________________________________________________________
+                           wait time (total, less is better)
+```
+
+## Changelog
+See the full changelog [here](./CHANGELOG.md).
 ___
 <a href="https://www.buymeacoffee.com/muffn" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
