@@ -2,7 +2,7 @@
 .dependencies/
 .venv/
 .vscode/
-
+.histfile
 *.pyc
 __pycache__/
 *.py[cod]
@@ -14,5 +14,5 @@ mansplaybook.yml
 *_old
 test.yml
 test_vars.yml
-
+playbook.yml
 !inventories/inventory.example.yml
