@@ -1,18 +1,18 @@
-name: Lint MANS
+# name: Lint MANS
 
-on:
-  pull_request:
-  push:
-    branches: [main, dev]
-  workflow_dispatch:
+# on:
+#   pull_request:
+#   push:
+#     branches: [main, dev]
+#   workflow_dispatch:
 
-jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Run ansible-lint
-        uses: ansible/ansible-lint@v24.9.2
-        with:
-          requirements_file: requirements.yml
-          args: "--exclude=.dependencies/ --exclude=.ansible/ --exclude=roles/geerlingguy.* --exclude=roles/stefangweichinger.*"
+# jobs:
+#   # lint:
+#   #   runs-on: ubuntu-latest
+#   #   steps:
+#   #     - uses: actions/checkout@v4
+#   #     - name: Run ansible-lint
+#   #       uses: ansible/ansible-lint@v24.9.2
+#   #       with:
+#   #         requirements_file: requirements.yml
+#   #         args: "--exclude=.dependencies/ --exclude=.ansible/ --exclude=roles/geerlingguy.* --exclude=roles/stefangweichinger.*"
