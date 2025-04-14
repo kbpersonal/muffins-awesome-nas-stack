@@ -14,5 +14,7 @@ mansplaybook.yml
 *_old
 test.yml
 test_vars.yml
+<<<<<<< HEAD
 playbook.yml
+.lock
 !inventories/inventory.example.yml

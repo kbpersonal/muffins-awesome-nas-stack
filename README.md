@@ -33,7 +33,7 @@ This role will do the following:
 * Configures mergerfs with `systemd` service files dependent on the config in `vars.yml`
 * Configures SnapRaid/snapper
   * Snapper configs verified and failsafe config re0-create initiated if issued are detected
-* Configures Samba (vladgh.samba.server)
+* Configures Samba (vladgh.samba.server) w/ custom performance tuning
 * Configures [mergerfs-cache-mover](https://github.com/MonsterMuffin/mergerfs-cache-mover)
 * Deploys & Configures [Scrutiny](https://github.com/AnalogJ/scrutiny)
 
@@ -42,11 +42,9 @@ I have written in-depth blog posts about how I got here and detailing how this s
 
 * [Part 3: Designing & Deploying MANS — A Hybrid NAS Approach with SnapRAID, MergerFS, and OpenZFS ](https://blog.muffn.io/posts/part-3-mini-100tb-nas/) attempts to explain my design approach.
 
-* [Part 4: MANS (Muffin's Awesome NAS Stack), An Overview And Guide](https://blog.muffn.io/posts/part-4-100tb-mini-nas/) goes through how this role works and fits together, as well as a much more concise explanation of all the variables.
+* [Part 4: MANS (Muffin's Awesome NAS Stack), An Overview And Guide](https://blog.muffn.io/posts/muffins-awesome-nas-stack) is my definitive guide to this role.
 
 I would ***highly recommend*** you read, at least, those two blog posts so you are familiar with how this works. I understand the yolo mentality, but please do not run this blindly.
-
-<small>(If that link doesn't work it's not released yet, but it's coming soon!)</small>
 
 ## Prerequisites
 
@@ -77,7 +75,6 @@ Firstly, make a copy of the inventory file, example playbook and example vars fi
 cd muffins-awesome-nas-stack
 cp inventories/inventory.example.yml inventories/inventory.yml
 cp vars_example.yml vars.yml
-cp mansplaybook_example.yml playbook.yml
 ```
 
 Edit your new `inventory.yml` file to include the IP/hostname of your Debian server/machine, along with the user you want to run Ansible as that has root access.
