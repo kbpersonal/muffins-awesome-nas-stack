@@ -1,12 +1,8 @@
+.ansible/
 .DS_Store
 .dependencies/
 .venv/
 .vscode/
-.histfile
-*.pyc
-__pycache__/
-*.py[cod]
-
 inventories/
 vars.yml
 mansplaybook.yml
@@ -14,7 +10,10 @@ mansplaybook.yml
 *_old
 test.yml
 test_vars.yml
-<<<<<<< HEAD
-playbook.yml
 .lock
+*au*/
 !inventories/inventory.example.yml
+*.md
+!README.md
+*.backup
+.histfile

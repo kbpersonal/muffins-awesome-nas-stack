@@ -2,8 +2,6 @@
 - name: Clone snapraid-btrfs-runner repository # Using personal fork here due to changes from other repo for Discord notification integration
   ansible.builtin.git:
     repo: https://github.com/kbpersonal/snapraid-btrfs-runner.git
-    dest: "{{ dir_snapraid_btfs_runner }}"
-    update: true
 
 - name: Copy and configure snapraid-btrfs-runner.conf
   ansible.builtin.template:
