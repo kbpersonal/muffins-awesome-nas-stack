@@ -17,3 +17,4 @@ test_vars.yml
 !README.md
 *.backup
 .histfile
+*.log
