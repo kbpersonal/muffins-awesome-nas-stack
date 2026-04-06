@@ -7,7 +7,7 @@
   ansible.builtin.command: mergerfs --version
   register: installed_mergerfs_version
   changed_when: false
-  ignore_errors: true
+  failed_when: false
   check_mode: false
 
 - name: Set update_needed to true if mergerfs is not installed
@@ -45,7 +45,7 @@
 
 - name: Install/update mergerfs
   when:
-    - ansible_pkg_mgr == 'apt'
+    - ansible_facts.pkg_mgr == 'apt'
     - update_needed
   block:
     - name: Install xz-utils package for .deb package installation

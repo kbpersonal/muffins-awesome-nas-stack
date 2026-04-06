@@ -1,12 +1,4 @@
 ---
-- name: Ensure parity mount points exist
-  ansible.builtin.file:
-    path: "{{ parity_mount_path }}/parity{{ '%02d' % (index + 1) }}"
-    state: directory
-    mode: "0770"
-  loop: "{{ parity_disks }}"
-  loop_control:
-    index_var: index
 
 - name: Ensure parity mounts are present in fstab
   ansible.builtin.blockinfile:
@@ -33,6 +25,7 @@
   loop: "{{ parity_disks }}"
   loop_control:
     index_var: index
+    label: "parity{{ '%02d' % (index + 1) }} - {{ item.device }}"
 
 # Cache Disks
 - name: Cache disks block
@@ -71,10 +64,10 @@
         owner: "{{ user }}"
         group: "{{ media_group }}"
         mode: "0770"
-        recurse: true
       loop: "{{ cache_disks_only }}"
       loop_control:
         index_var: index
+        label: "{{ cache_mount_path }}/cache{{ '%02d' % (index + 1) }}"
 
 # Cache Paths
 - name: Ensure cache paths exist

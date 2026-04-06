@@ -6,7 +6,7 @@
 
 - name: Parse mount points from fstab
   ansible.builtin.set_fact:
-    valid_mounts: "{{ fstab_mounts.stdout | regex_findall('/mnt/(parity|cache|data)-disks/\\w+') }}"
+    valid_mounts: "{{ fstab_mounts.stdout | regex_findall('/mnt/(?:parity|cache|data)-disks/\\w+') }}"
 
 - name: Find all existing mount point directories
   ansible.builtin.find:
@@ -23,12 +23,17 @@
     msg:
       - "Valid mounts from fstab: {{ valid_mounts }}"
       - "Existing mount points: {{ existing_mounts.files | map(attribute='path') | list }}"
-      - "Currently mounted: {{ ansible_mounts | map(attribute='mount') | list }}"
+      - "Currently mounted: {{ ansible_facts.mounts | map(attribute='mount') | list }}"
     verbosity: 1
+
+- name: Refresh mount facts
+  ansible.builtin.setup:
+    gather_subset:
+      - mounts
 
 - name: Get currently mounted paths
   ansible.builtin.set_fact:
-    mounted_paths: "{{ ansible_mounts | map(attribute='mount') | list }}"
+    mounted_paths: "{{ ansible_facts.mounts | map(attribute='mount') | list }}"
 
 - name: Identify orphaned mount points
   ansible.builtin.set_fact:
