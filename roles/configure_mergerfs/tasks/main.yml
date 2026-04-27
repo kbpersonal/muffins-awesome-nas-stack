@@ -51,6 +51,7 @@
 - name: Configure mount perms
   ansible.builtin.include_tasks:
     file: configure_perms.yml
+  when: configure_mergerfs_set_permissions | default(true) | bool
 
 - name: Cleanup
   ansible.builtin.include_tasks:
