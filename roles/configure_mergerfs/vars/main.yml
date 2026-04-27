@@ -1,4 +1,4 @@
 ---
-configure_mergerfs_minfreespace: 250G
+configure_mergerfs_minfreespace: 100G
 configure_mergerfs_cache_minfreespace: 50G
-configure_mergerfs_cold_create_policy: pfrd
+configure_mergerfs_cold_create_policy: epmfs
